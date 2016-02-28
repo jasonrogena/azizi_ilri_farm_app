@@ -2,6 +2,7 @@ package org.cgiar.ilri.farm.ui.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -105,14 +106,14 @@ public class AnimalListAdapter extends RecyclerView.Adapter<AnimalListAdapter.An
     public static class AnimalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView animalIdTV, sexTV, breedTV, speciesTV, statusTV;
         private final View itemView;
+        private CardView animalItemCV;
         private String animalId;
-        private LinearLayout itemCanvasLL;
 
         public AnimalViewHolder(View itemView) {
             super(itemView);
             this.itemView = itemView;
-            itemCanvasLL = (LinearLayout)itemView.findViewById(R.id.item_canvas_ll);
-            itemCanvasLL.setOnClickListener(this);
+            animalItemCV = (CardView)itemView.findViewById(R.id.animal_item_cv);
+            animalItemCV.setOnClickListener(this);
             animalIdTV = (TextView)itemView.findViewById(R.id.animal_id_tv);
             sexTV = (TextView)itemView.findViewById(R.id.sex_tv);
             breedTV = (TextView)itemView.findViewById(R.id.breed_tv);
@@ -169,7 +170,7 @@ public class AnimalListAdapter extends RecyclerView.Adapter<AnimalListAdapter.An
 
         @Override
         public void onClick(View v) {
-            if (v.equals(itemCanvasLL)) {
+            if (v.equals(animalItemCV)) {
                 //start the animal activity
                 if(animalId != null) {
                     Context context = itemView.getContext();

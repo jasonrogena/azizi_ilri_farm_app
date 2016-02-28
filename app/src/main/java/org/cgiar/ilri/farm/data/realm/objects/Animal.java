@@ -1,6 +1,7 @@
 package org.cgiar.ilri.farm.data.realm.objects;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import org.cgiar.ilri.farm.data.realm.utils.RealmDatabase;
@@ -185,5 +186,27 @@ public class Animal extends RealmObject {
     public static RealmResults<Animal> getAllAnimals(Realm realm) {
         RealmResults<Animal> results = realm.where(Animal.class).findAll();
         return results;
+    }
+
+    public static Animal getSire(Realm realm, Animal animal) {
+        //TODO: get sire from animal
+        String sireId = "BJ054";
+        RealmResults<Animal> sires = Animal.getAnimals(realm, sireId);
+        if(sires != null && sires.size() == 1) {
+            Animal sire = sires.get(0);
+            return sire;
+        }
+        return null;
+    }
+
+    public static Animal getDam(Realm realm, Animal animal) {
+        //TODO: get dam from animal
+        String sireId = "BJ053";
+        RealmResults<Animal> dams = Animal.getAnimals(realm, sireId);
+        if(dams != null && dams.size() == 1) {
+            Animal dam = dams.get(0);
+            return dam;
+        }
+        return null;
     }
 }

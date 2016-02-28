@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#511717</color><!-- ILRI Maroon -->
-    <color name="colorPrimaryDark">#350f0f</color>
-    <color name="colorAccent">#2b671e</color><!-- CGIAR Green -->
+    <color name="colorPrimary">#009688</color><!-- ILRI Maroon -->
+    <color name="colorPrimaryDark">#00796B</color>
+    <color name="colorPrimaryLight">#B2DFDB</color><!-- CGIAR Green -->
+    <color name="colorAccent">#FF5722</color><!-- CGIAR Green -->
+    <color name="superLightGrey">#E6E6E6</color>
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#727272</color>
+    <color name="divider">#B6B6B6</color>
 </resources>
