@@ -1,4 +1,4 @@
-package org.cgiar.ilri.farm;
+package org.cgiar.ilri.farm.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -8,15 +8,29 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class Farm extends AppCompatActivity
+import org.cgiar.ilri.farm.R;
+import org.cgiar.ilri.farm.data.realm.objects.Animal;
+import org.cgiar.ilri.farm.data.realm.utils.RealmDatabase;
+import org.cgiar.ilri.farm.ui.adapters.AnimalListAdapter;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+
+public class FarmActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
     private static final String TAG = "ILRIFarm.Farm";
+    private RecyclerView animalListRV;
+    private AnimalListAdapter animalListAdapter;
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +46,41 @@ public class Farm extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        initViews();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        RealmDatabase.close(realm);
+        super.onDestroy();
+    }
+
+    /**
+     * This method initializes the views in this activity
+     */
+    private void initViews() {
+        animalListAdapter = new AnimalListAdapter(this);
+        animalListRV = (RecyclerView)findViewById(R.id.animal_list_rv);
+        animalListRV.setAdapter(animalListAdapter);
+        animalListRV.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    /**
+     * This method refreshes the data in all the views. It assumes that the views have already been
+     * initialized
+     */
+    private void refreshData() {
+        realm = RealmDatabase.create(this, realm);
+        if(RealmDatabase.isOpen(realm)) {
+            RealmResults<Animal> allAnimals = Animal.getAllAnimals(realm);
+            animalListAdapter.addAll(allAnimals);
+        }
     }
 
     @Override
