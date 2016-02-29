@@ -38,6 +38,7 @@ public class AnimalActivity extends AppCompatActivity implements View.OnClickLis
     private TextView sireIdTV, sireBreedsTV, sireStatusTV;
     private LinearLayout damCanvasLL;
     private LinearLayout sireCanvasLL;
+    private LinearLayout locationCanvasLL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +99,7 @@ public class AnimalActivity extends AppCompatActivity implements View.OnClickLis
 
         ownerTV = (TextView)findViewById(R.id.owner_tv);
         experimentTV = (TextView)findViewById(R.id.experiment_tv);
+        locationCanvasLL = (LinearLayout)findViewById(R.id.location_canvas_ll);
         locLayer1TV = (TextView)findViewById(R.id.loc_layer_1_tv);
         locLayer2TV = (TextView)findViewById(R.id.loc_layer_2_tv);
         locCommentTV = (TextView)findViewById(R.id.loc_comment_tv);
@@ -154,14 +156,20 @@ public class AnimalActivity extends AppCompatActivity implements View.OnClickLis
                 ownerTV.setText("Owner: Unknown");
                 experimentTV.setText("Experiment: None");
 
-                Location location = animal.getLocation();
-                locLayer1TV.setText(location.getLevel1());
-                locLayer2TV.setText(location.getLevel2());
-                if(location.getComment() != null && location.getComment().length() > 0) {
-                    locCommentTV.setVisibility(View.VISIBLE);
-                    locCommentTV.setText(location.getComment());
+                RealmResults<Location> locations = Location.getLocations(realm, animal.getLocationId());
+                if(locations != null && locations.size() == 1) {
+                    locationCanvasLL.setVisibility(View.VISIBLE);
+                    Location location = locations.get(0);
+                    locLayer1TV.setText(location.getLevel1());
+                    locLayer2TV.setText(location.getLevel2());
+                    if(location.getComment() != null && location.getComment().length() > 0) {
+                        locCommentTV.setVisibility(View.VISIBLE);
+                        locCommentTV.setText(location.getComment());
+                    } else {
+                        locCommentTV.setVisibility(View.GONE);
+                    }
                 } else {
-                    locCommentTV.setVisibility(View.GONE);
+                    locationCanvasLL.setVisibility(View.GONE);
                 }
 
                 Animal dam = Animal.getDam(realm, animal);

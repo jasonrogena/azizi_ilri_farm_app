@@ -146,6 +146,7 @@
                     android:textColor="@color/secondaryText"
                     android:textSize="18dp"/>
                 <LinearLayout
+                    android:id="@+id/location_canvas_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"

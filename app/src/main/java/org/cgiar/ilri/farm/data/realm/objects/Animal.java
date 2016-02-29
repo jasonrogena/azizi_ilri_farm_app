@@ -1,7 +1,6 @@
 package org.cgiar.ilri.farm.data.realm.objects;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import org.cgiar.ilri.farm.data.realm.utils.RealmDatabase;
@@ -29,7 +28,7 @@ public class Animal extends RealmObject {
     private RealmList<Breed> breeds;//nullable
     private Sex sex;
     private String status;
-    private Location location;//nullable
+    private int locationId;
 
     public Animal(String animalId) {
         this.animalId = animalId;
@@ -79,12 +78,12 @@ public class Animal extends RealmObject {
         this.status = status;
     }
 
-    public Location getLocation() {
-        return location;
+    public int getLocationId() {
+        return locationId;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
     }
 
     /**
@@ -121,14 +120,14 @@ public class Animal extends RealmObject {
                 animal.setBreeds(breeds);
             }
 
-            if(data.has("location")) {
-                JSONObject locData = data.getJSONObject("location");
-                Location location = realm.createObject(Location.class);
-                location.setLevel1(locData.getString("level_1"));
-                location.setLevel2(locData.getString("level_2"));
-                location.setComment(locData.getString("comment"));
-                animal.setLocation(location);
-            }
+            JSONObject locData = data.getJSONObject("location");
+            Location location = new Location();
+            location.setId(locData.getInt("id"));
+            location.setLevel1(locData.getString("level_1"));
+            location.setLevel2(locData.getString("level_2"));
+            location.setComment(locData.getString("comment"));
+            realm.copyToRealmOrUpdate(location);
+            animal.setLocationId(location.getId());
 
             return animal;
         }
@@ -183,11 +182,24 @@ public class Animal extends RealmObject {
         return animals;
     }
 
+    /**
+     * This method returns all animals available on the device
+     *
+     * @param realm The realm object to use to get the animals
+     * @return
+     */
     public static RealmResults<Animal> getAllAnimals(Realm realm) {
         RealmResults<Animal> results = realm.where(Animal.class).findAll();
         return results;
     }
 
+    /**
+     * This method returns the sire for the provided animal
+     *
+     * @param realm     The realm object to use to get the sire
+     * @param animal    The animal to get the sire for
+     * @return
+     */
     public static Animal getSire(Realm realm, Animal animal) {
         //TODO: get sire from animal
         String sireId = "BJ054";
@@ -199,6 +211,13 @@ public class Animal extends RealmObject {
         return null;
     }
 
+    /**
+     * This method returns the dam for the provided animal
+     *
+     * @param realm     The realm object to use to get the dam
+     * @param animal    The animal to get the dam for
+     * @return
+     */
     public static Animal getDam(Realm realm, Animal animal) {
         //TODO: get dam from animal
         String sireId = "BJ053";
@@ -208,5 +227,13 @@ public class Animal extends RealmObject {
             return dam;
         }
         return null;
+    }
+
+    public static RealmResults<Animal> getAnimalsInLocation(Realm realm, int locationId) {
+        RealmQuery<Animal> query = realm.where(Animal.class);
+        query.equalTo("locationId", locationId);
+        RealmResults<Animal> animals = query.findAll();
+
+        return animals;
     }
 }

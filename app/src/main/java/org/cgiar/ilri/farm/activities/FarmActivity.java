@@ -1,5 +1,6 @@
 package org.cgiar.ilri.farm.activities;
 
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -15,38 +16,54 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 
 import org.cgiar.ilri.farm.R;
 import org.cgiar.ilri.farm.data.realm.objects.Animal;
+import org.cgiar.ilri.farm.data.realm.objects.Location;
 import org.cgiar.ilri.farm.data.realm.utils.RealmDatabase;
 import org.cgiar.ilri.farm.ui.adapters.AnimalListAdapter;
+import org.cgiar.ilri.farm.ui.adapters.LocationsToolbarAdapter;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class FarmActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener, AdapterView.OnItemSelectedListener {
     private static final String TAG = "ILRIFarm.Farm";
     private RecyclerView animalListRV;
     private AnimalListAdapter animalListAdapter;
     private Realm realm;
+    private ActionBar actionBar;
+    private Spinner toolbarSpinnerS;
+    private LocationsToolbarAdapter toolbarSpinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_farm);
+        initToolBar();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        initViews();
+    }
+
+    private void initToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbarSpinnerS = (Spinner) findViewById(R.id.toolbar_spinner_s);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        initViews();
     }
 
     @Override
@@ -78,8 +95,27 @@ public class FarmActivity extends AppCompatActivity
     private void refreshData() {
         realm = RealmDatabase.create(this, realm);
         if(RealmDatabase.isOpen(realm)) {
+            refreshToolbarData();
             RealmResults<Animal> allAnimals = Animal.getAllAnimals(realm);
             animalListAdapter.addAll(allAnimals);
+        }
+    }
+
+    private void refreshToolbarData() {
+        if(RealmDatabase.isOpen(realm)) {
+            RealmResults<Location> locations = Location.getAllLocations(realm);
+            ArrayList<LocationsToolbarAdapter.Location> items = new ArrayList<>();
+            //the first item in the list should always be the app name representing all the animals
+            items.add(new LocationsToolbarAdapter.Location(getResources().getString(R.string.app_name), null));
+            if(locations != null) {
+                for (int i = 0; i < locations.size(); i++) {
+                    LocationsToolbarAdapter.Location currLoc = new LocationsToolbarAdapter.Location(locations.get(i).getId(), locations.get(i).getLevel1(), locations.get(i).getLevel2());
+                    items.add(currLoc);
+                }
+            }
+            toolbarSpinnerAdapter = new LocationsToolbarAdapter(this, R.layout.view_location_spinner_item, R.layout.view_location_spinner_dropdown, items);
+            toolbarSpinnerS.setAdapter(toolbarSpinnerAdapter);
+            toolbarSpinnerS.setOnItemSelectedListener(this);
         }
     }
 
@@ -161,5 +197,31 @@ public class FarmActivity extends AppCompatActivity
     public boolean onQueryTextChange(String newText) {
         Log.d(TAG, newText);
         return false;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG, "OnItemSelected called");
+        if(parent.equals(toolbarSpinnerS)) {
+            Log.d(TAG, "here1");
+            if(toolbarSpinnerAdapter != null) {
+                Log.d(TAG, "here2");
+                LocationsToolbarAdapter.Location location = toolbarSpinnerAdapter.getItem(position);
+                if(location.getId() == LocationsToolbarAdapter.Location.DEFAULT_ID) {//user wants all the animals
+                    animalListAdapter.clear();
+                    RealmResults<Animal> allAnimals = Animal.getAllAnimals(realm);
+                    animalListAdapter.addAll(allAnimals);
+                } else {
+                    animalListAdapter.clear();
+                    RealmResults<Animal> animals = Animal.getAnimalsInLocation(realm, location.getId());
+                    animalListAdapter.addAll(animals);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
