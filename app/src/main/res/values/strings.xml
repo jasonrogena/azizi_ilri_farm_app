@@ -17,4 +17,17 @@
     <string name="title_ownership">Ownership</string>
     <string name="title_origin">Origin</string>
     <string name="title_location">Location</string>
+    <string name="title_record">Record</string>
+    <string name="label_add_animal">Animal Entry</string>
+    <string name="label_edit">Edit</string>
+    <string name="label_seen">Record as Seen</string>
+    <string name="label_dipping_spraying">Dipping/Spraying</string>
+    <string name="label_vaccination">Vaccination</string>
+    <string name="label_deworming">Deworming</string>
+    <string name="label_death">Death</string>
+    <string name="label_disposal_request">Disposal Request</string>
+    <string name="label_weighing">Weighing</string>
+    <string name="label_tagging">(Re)tag</string>
+    <string name="label_change_owner">Change Owner</string>
+    <string name="label_change_location">Change Location</string>
 </resources>

@@ -2,10 +2,13 @@ package org.cgiar.ilri.farm.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,6 +19,7 @@ import org.cgiar.ilri.farm.data.realm.objects.Animal;
 import org.cgiar.ilri.farm.data.realm.objects.Breed;
 import org.cgiar.ilri.farm.data.realm.objects.Location;
 import org.cgiar.ilri.farm.data.realm.utils.RealmDatabase;
+import org.cgiar.ilri.farm.utils.Display;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -39,6 +43,7 @@ public class AnimalActivity extends AppCompatActivity implements View.OnClickLis
     private LinearLayout damCanvasLL;
     private LinearLayout sireCanvasLL;
     private LinearLayout locationCanvasLL;
+    private FloatingActionButton recordFAB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +120,9 @@ public class AnimalActivity extends AppCompatActivity implements View.OnClickLis
         sireIdTV = (TextView)findViewById(R.id.sire_id_tv);
         sireBreedsTV = (TextView)findViewById(R.id.sire_breeds_tv);
         sireStatusTV = (TextView)findViewById(R.id.sire_status_tv);
+
+        recordFAB = (FloatingActionButton)findViewById(R.id.record_fab);
+        recordFAB.setOnClickListener(this);
     }
 
     /**
@@ -247,6 +255,16 @@ public class AnimalActivity extends AppCompatActivity implements View.OnClickLis
                     startActivity(intent);
                 }
             }
+        } else if(v.equals(recordFAB)) {
+            showRecordDialog();
         }
+    }
+
+    private void showRecordDialog() {
+        AppCompatDialog dialog = new AppCompatDialog(this);
+        dialog.getWindow().setLayout(Display.getWidth(this), ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setContentView(R.layout.dialog_animal_events);
+        dialog.setTitle(getResources().getString(R.string.title_record));
+        dialog.show();
     }
 }

@@ -4,11 +4,13 @@ import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -17,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
@@ -26,6 +29,7 @@ import org.cgiar.ilri.farm.data.realm.objects.Location;
 import org.cgiar.ilri.farm.data.realm.utils.RealmDatabase;
 import org.cgiar.ilri.farm.ui.adapters.AnimalListAdapter;
 import org.cgiar.ilri.farm.ui.adapters.LocationsToolbarAdapter;
+import org.cgiar.ilri.farm.utils.Display;
 
 import java.util.ArrayList;
 
@@ -33,7 +37,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class FarmActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener, AdapterView.OnItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
     private static final String TAG = "ILRIFarm.Farm";
     private RecyclerView animalListRV;
     private AnimalListAdapter animalListAdapter;
@@ -41,6 +45,7 @@ public class FarmActivity extends AppCompatActivity
     private ActionBar actionBar;
     private Spinner toolbarSpinnerS;
     private LocationsToolbarAdapter toolbarSpinnerAdapter;
+    private FloatingActionButton recordFAB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +91,8 @@ public class FarmActivity extends AppCompatActivity
         animalListRV = (RecyclerView)findViewById(R.id.animal_list_rv);
         animalListRV.setAdapter(animalListAdapter);
         animalListRV.setLayoutManager(new LinearLayoutManager(this));
+        recordFAB = (FloatingActionButton)findViewById(R.id.record_fab);
+        recordFAB.setOnClickListener(this);
     }
 
     /**
@@ -201,11 +208,8 @@ public class FarmActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(TAG, "OnItemSelected called");
         if(parent.equals(toolbarSpinnerS)) {
-            Log.d(TAG, "here1");
             if(toolbarSpinnerAdapter != null) {
-                Log.d(TAG, "here2");
                 LocationsToolbarAdapter.Location location = toolbarSpinnerAdapter.getItem(position);
                 if(location.getId() == LocationsToolbarAdapter.Location.DEFAULT_ID) {//user wants all the animals
                     animalListAdapter.clear();
@@ -223,5 +227,20 @@ public class FarmActivity extends AppCompatActivity
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.equals(recordFAB)) {
+            showRecordDialog();
+        }
+    }
+
+    private void showRecordDialog() {
+        AppCompatDialog dialog = new AppCompatDialog(this);
+        dialog.getWindow().setLayout(Display.getWidth(this), ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setContentView(R.layout.dialog_farm_events);
+        dialog.setTitle(getResources().getString(R.string.title_record));
+        dialog.show();
     }
 }
